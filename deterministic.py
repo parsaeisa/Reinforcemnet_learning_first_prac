@@ -1,4 +1,9 @@
 # for defining environmets and rewards 
+import math
+from operator import truediv
+from os import stat
+
+
 GRID_HEIGHT = 5
 GRID_WIDTH = 5
 TERMINAL_REWARD = 10 
@@ -8,13 +13,14 @@ GAMMA = 1.0
 TETHA = 1e-10
 
 class GridWorld :
-    def __init__(self,grid_size , items, grid_height , grid_width) -> None:
+    def __init__(self,grid_size , items, grid_height , grid_width,gamma , threshold) -> None:
         
         self.constant_reward = -1 
         # I think this is minus
         # because moving to another state 
         # exhaust us and is bad .
-
+        self.gamma = gamma
+        self.threshold = threshold
         self.grid_height = grid_height
         self.grid_width = grid_width
         self.items = items
@@ -45,9 +51,45 @@ class GridWorld :
                 self.P[(state , action)] = (next_state , reward )
         return self.P
 
-def compute_policy ():
+    def check_terminal (self , state) :
+        for item in self.items :
+            if state in self.items[item]["loc"] :
+                return True
+        
+        return False
+
+def compute_policy (environment):
+    info = environment.get_P()
+
+    v = {}
+    DELTA = 0 
+    converged = False
     # find best action 
     # till conversion 
+    while not converged : 
+        for state in environment.states : 
+            # if state is terminal , value is 0 
+            if environment.check_terminal (state) :
+                v[state] = 0
+                continue
+
+            # else , find best action 
+            old_v = v[state]
+            most_reward = -1 * math.inf
+            # most_valuable_action = 'U'
+            for action in environment.actions :
+                next_state , reward = info[(state,action)] 
+                reward += environment.gamma * v[next_state]
+                if reward > most_reward : 
+                    most_reward = reward
+                    # most_valuable_action = action
+
+            v[state] = most_reward
+
+            # check conversion condition 
+            DELTA = max(DELTA, abs(old_v , v[state]))
+            if DELTA < environment.threshold :
+                converged = True
 
 
     # find best policy 
@@ -61,3 +103,5 @@ if __name__ == '__main__' :
     }
 
     environment = GridWorld(grid_size , items )
+    
+    policy = compute_policy(environment)
