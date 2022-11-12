@@ -3,19 +3,19 @@ import math
 from operator import truediv
 from os import stat
 
-
 GRID_HEIGHT = 5
 GRID_WIDTH = 5
-TERMINAL_REWARD = 10 
+TERMINAL_REWARD = 10
 
 # for value iteration 
 GAMMA = 1.0
 TETHA = 1e-10
 
-class GridWorld :
-    def __init__(self,grid_size , items, grid_height , grid_width,gamma , threshold) -> None:
-        
-        self.constant_reward = -1 
+
+class GridWorld:
+    def __init__(self, grid_size, items, grid_height, grid_width, gamma, threshold) -> None:
+
+        self.constant_reward = -1
         # I think this is minus
         # because moving to another state 
         # exhaust us and is bad .
@@ -25,51 +25,52 @@ class GridWorld :
         self.grid_width = grid_width
         self.items = items
         self.states = list(range(self.grid_width * self.grid_height))
-        self.actions = ['Up' , 'Down', 'Left', 'Right']    
+        self.actions = ['Up', 'Down', 'Left', 'Right']
 
-        self.next_state = {'Up': -self.grid_width , 'Down': self.grid_width, 'Left':-1, 'Right':1}
+        self.next_state = {'Up': -self.grid_width, 'Down': self.grid_width, 'Left': -1, 'Right': 1}
 
-    def get_P (self):
+    def get_P(self):
         self.P = {}
 
         # define rewards and next states  , for each state and each action in that space 
-        for state in range(self.grid_width * self.grid_height) :            
-            for action in self.actions : 
+        for state in range(self.grid_width * self.grid_height):
+            for action in self.actions:
                 # compute next state
                 next_state = state + self.next_state[action]
 
                 # compute reward
                 # based on base reward and fire or water states 
                 reward = self.constant_reward
-                if next_state in self.items["fire"]["loc"] :
+                if next_state in self.items["fire"]["loc"]:
                     reward -= self.items["fire"]["reward"]
 
-                if next_state in self.items["water"]["loc"] :
+                if next_state in self.items["water"]["loc"]:
                     reward += self.items["water"]["reward"]
-    
+
                 # adding it to P 
-                self.P[(state , action)] = (next_state , reward )
+                self.P[(state, action)] = (next_state, reward)
         return self.P
 
-    def check_terminal (self , state) :
-        for item in self.items :
-            if state in self.items[item]["loc"] :
+    def check_terminal(self, state):
+        for item in self.items:
+            if state in self.items[item]["loc"]:
                 return True
-        
+
         return False
 
-def compute_policy (environment):
+
+def compute_policy(environment):
     info = environment.get_P()
 
     v = {}
-    DELTA = 0 
+    DELTA = 0
     converged = False
     # find best action 
     # till conversion 
-    while not converged : 
-        for state in environment.states : 
+    while not converged:
+        for state in environment.states:
             # if state is terminal , value is 0 
-            if environment.check_terminal (state) :
+            if environment.check_terminal(state):
                 v[state] = 0
                 continue
 
@@ -77,31 +78,31 @@ def compute_policy (environment):
             old_v = v[state]
             most_reward = -1 * math.inf
             # most_valuable_action = 'U'
-            for action in environment.actions :
-                next_state , reward = info[(state,action)] 
+            for action in environment.actions:
+                next_state, reward = info[(state, action)]
                 reward += environment.gamma * v[next_state]
-                if reward > most_reward : 
+                if reward > most_reward:
                     most_reward = reward
                     # most_valuable_action = action
 
             v[state] = most_reward
 
             # check conversion condition 
-            DELTA = max(DELTA, abs(old_v , v[state]))
-            if DELTA < environment.threshold :
+            DELTA = max(DELTA, abs(old_v, v[state]))
+            if DELTA < environment.threshold:
                 converged = True
 
-
-    # find best policy 
+    # find best policy
     pass
 
-if __name__ == '__main__' :
-    grid_size = (GRID_HEIGHT , GRID_WIDTH)
+
+if __name__ == '__main__':
+    grid_size = (GRID_HEIGHT, GRID_WIDTH)
     items = {
-        'fire' : {'reward': -1 * TERMINAL_REWARD , 'loc' : [12]},
-        'water' : {'reward': TERMINAL_REWARD , 'loc' : [18]},
+        'fire': {'reward': -1 * TERMINAL_REWARD, 'loc': [12]},
+        'water': {'reward': TERMINAL_REWARD, 'loc': [18]},
     }
 
-    environment = GridWorld(grid_size , items )
-    
+    environment = GridWorld(grid_size, items)
+
     policy = compute_policy(environment)
