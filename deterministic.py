@@ -30,6 +30,7 @@ class GridWorld:
         self.next_state = {'Up': -self.grid_width, 'Down': self.grid_width, 'Left': -1, 'Right': 1}
 
         # This P takes (state , action ) and returns (new_state ,reward )
+        # P gives us an information about the environment
         self.P = self.get_P()
 
     def get_P(self):
