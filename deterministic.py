@@ -71,6 +71,17 @@ class GridWorld:
 
 
 def compute_policy(environment):
+
+    '''
+    this method consists two loops where :
+    the first one finds value of each state
+    the second one finds the best policy
+
+    :param environment:
+    :return:
+    '''
+
+
     info = environment.get_P()
 
     v = {}
