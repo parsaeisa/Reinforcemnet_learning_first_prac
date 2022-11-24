@@ -117,7 +117,7 @@ def compute_policy(environment):
 
     # Find the best policy .
     # Policy is a map from state to action
-    policy = {}
+    policy = np.full(environment.grid_width * environment.grid_width, 'n')
 
     for state in environment.states:
         new_v = []
@@ -125,9 +125,10 @@ def compute_policy(environment):
             (next_state, reward) = info[(state, action)]
             new_v.append(reward + environment.gamma * v[state])
 
-        best_value = np.array(new_v).max()
+        new_v = np.array(new_v)
+        best_value = new_v.max()
         best_action_idx = np.where(new_v == best_value)[0]
-        best_action = environment.actions[best_action_idx]
+        best_action = environment.actions[best_action_idx[0]]
         policy[state] = best_action
 
         matrix_plotter(policy)
