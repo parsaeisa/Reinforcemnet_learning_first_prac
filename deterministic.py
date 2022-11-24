@@ -83,12 +83,13 @@ def compute_policy(environment):
 
     info = environment.get_P()
 
-    v = {}
-    DELTA = 0
+    v = np.zeros(environment.grid_width * environment.grid_height)
     converged = False
-    # find best action 
-    # till conversion 
+
+    # find best action
+    # till conversion
     while not converged:
+        DELTA = 0
         for state in environment.states:
             # if state is terminal , value is 0 
             if environment.check_terminal(state):
@@ -102,15 +103,15 @@ def compute_policy(environment):
             # most_valuable_action = 'U'
             for action in environment.actions:
                 next_state, reward = info[(state, action)]
-                reward += environment.gamma * v[next_state]
-                rewards.append(reward)
+                rewards.append(reward + environment.gamma * v[next_state])
 
-            v[state] = np.max(rewards)
+            v[state] = np.array(rewards).max()
 
             # check conversion condition
             # If the difference between old value and new value of a state is lower than a
             # determined threshold , the algorithm is converged .
             DELTA = max(DELTA, abs(old_v - v[state]))
+            # print("delta : ", DELTA)
             if DELTA < environment.threshold:
                 converged = True
 
@@ -149,6 +150,6 @@ if __name__ == '__main__':
         'water': {'reward': TERMINAL_REWARD, 'loc': [18]},
     }
 
-    environment = GridWorld(grid_size, items)
+    environment = GridWorld(grid_size, items, gamma=1, threshold=1e-10)
 
     policy = compute_policy(environment)
