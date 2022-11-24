@@ -72,7 +72,6 @@ class GridWorld:
 
 
 def compute_policy(environment):
-
     '''
     this method consists two loops where :
     the first one finds value of each state
@@ -81,7 +80,6 @@ def compute_policy(environment):
     :param environment:
     :return:
     '''
-
 
     info = environment.get_P()
 
@@ -109,13 +107,31 @@ def compute_policy(environment):
 
             v[state] = np.max(rewards)
 
-            # check conversion condition 
+            # check conversion condition
+            # If the difference between old value and new value of a state is lower than a
+            # determined threshold , the algorithm is converged .
             DELTA = max(DELTA, abs(old_v - v[state]))
             if DELTA < environment.threshold:
                 converged = True
 
-    # find best policy
-    pass
+    # Find the best policy .
+    # Policy is a map from state to action
+    policy = {}
+
+    for state in environment.states:
+        new_v = []
+        for action in environment.actions:
+            (next_state, reward) = info[(state, action)]
+            new_v.append(reward + environment.gamma * v[state])
+
+        best_value = np.array(new_v).max()
+        best_action_idx = np.where(new_v == best_value)[0]
+        best_action = environment.actions[best_action_idx]
+        policy[state] = best_action
+
+        matrix_plotter(policy)
+
+    return policy
 
 
 def matrix_plotter(m):
