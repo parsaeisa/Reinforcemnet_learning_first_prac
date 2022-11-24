@@ -13,7 +13,7 @@ TETHA = 1e-10
 
 
 class GridWorld:
-    def __init__(self, grid_size, items, grid_height, grid_width, gamma, threshold) -> None:
+    def __init__(self, grid_size, items, gamma=0, threshold=0) -> None:
 
         self.constant_reward = -1
         # I think this is minus
@@ -21,8 +21,8 @@ class GridWorld:
         # exhaust us and is bad .
         self.gamma = gamma
         self.threshold = threshold
-        self.grid_height = grid_height
-        self.grid_width = grid_width
+        self.grid_height = grid_size[0]
+        self.grid_width = grid_size[1]
         self.items = items
         self.states = list(range(self.grid_width * self.grid_height))
         self.actions = ['Up', 'Down', 'Left', 'Right']
@@ -45,10 +45,13 @@ class GridWorld:
                 # based on base reward and fire or water states 
                 reward = self.constant_reward
                 if next_state in self.items["fire"]["loc"]:
-                    reward -= self.items["fire"]["reward"]
+                    reward += self.items["fire"]["reward"]
 
-                if next_state in self.items["water"]["loc"]:
+                elif next_state in self.items["water"]["loc"]:
                     reward += self.items["water"]["reward"]
+
+                elif self.is_out_of_environment(next_state):
+                    next_state = state
 
                 # adding it to P 
                 P[(state, action)] = (next_state, reward)
@@ -60,6 +63,10 @@ class GridWorld:
                 return True
 
         return False
+
+    def is_out_of_environment(self, next_state):
+        if next_state not in self.states:
+            return True
 
 
 def compute_policy(environment):
