@@ -29,8 +29,11 @@ class GridWorld:
 
         self.next_state = {'Up': -self.grid_width, 'Down': self.grid_width, 'Left': -1, 'Right': 1}
 
+        # This P takes (state , action ) and returns (new_state ,reward )
+        self.P = self.get_P()
+
     def get_P(self):
-        self.P = {}
+        P = {}
 
         # define rewards and next states  , for each state and each action in that space 
         for state in range(self.grid_width * self.grid_height):
@@ -48,8 +51,8 @@ class GridWorld:
                     reward += self.items["water"]["reward"]
 
                 # adding it to P 
-                self.P[(state, action)] = (next_state, reward)
-        return self.P
+                P[(state, action)] = (next_state, reward)
+        return P
 
     def check_terminal(self, state):
         for item in self.items:
