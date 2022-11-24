@@ -2,6 +2,7 @@
 import math
 from operator import truediv
 from os import stat
+import numpy as np
 
 GRID_HEIGHT = 5
 GRID_WIDTH = 5
@@ -98,24 +99,31 @@ def compute_policy(environment):
 
             # else , find best action 
             old_v = v[state]
-            most_reward = -1 * math.inf
+            rewards = []
+
             # most_valuable_action = 'U'
             for action in environment.actions:
                 next_state, reward = info[(state, action)]
                 reward += environment.gamma * v[next_state]
-                if reward > most_reward:
-                    most_reward = reward
-                    # most_valuable_action = action
+                rewards.append(reward)
 
-            v[state] = most_reward
+            v[state] = np.max(rewards)
 
             # check conversion condition 
-            DELTA = max(DELTA, abs(old_v, v[state]))
+            DELTA = max(DELTA, abs(old_v - v[state]))
             if DELTA < environment.threshold:
                 converged = True
 
     # find best policy
     pass
+
+
+def matrix_plotter(m):
+    for i in range(0, 25, 5):
+        for j in m[i:i + 5]:
+            print(j, end=" ")
+        print("\n")
+    print("===========================\n")
 
 
 if __name__ == '__main__':
