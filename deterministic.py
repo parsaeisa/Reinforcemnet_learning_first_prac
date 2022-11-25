@@ -52,7 +52,7 @@ class GridWorld:
                 elif next_state in self.items["water"]["loc"]:
                     reward += self.items["water"]["reward"]
 
-                elif self.is_out_of_environment(next_state):
+                elif self.is_out_of_environment(next_state , state):
                     next_state = state
 
                 # adding it to P 
@@ -66,10 +66,17 @@ class GridWorld:
 
         return False
 
-    def is_out_of_environment(self, next_state):
+    def is_out_of_environment(self, next_state , state):
         if next_state not in self.states:
             return True
 
+        # Forbidding moving left in the most left column
+        if state % self.grid_width == 0 and next_state % self.grid_width == self.grid_width -1:
+            return True
+
+        # Forbidding moving right in the most right column
+        if state % self.grid_width == self.grid_width -1 and next_state % self.grid_width == 0:
+            return True
 
 def compute_policy(environment):
     '''
@@ -91,6 +98,8 @@ def compute_policy(environment):
     while not converged:
         DELTA = 0
         for state in environment.states:
+            if state == 20:
+                print("hereee")
             # if state is terminal , value is 0 
             if environment.check_terminal(state):
                 v[state] = 0
@@ -120,10 +129,12 @@ def compute_policy(environment):
     policy = np.full(environment.grid_width * environment.grid_width, 'n')
 
     for state in environment.states:
+        if state == 20:
+            print("hereee")
         new_v = []
         for action in environment.actions:
             (next_state, reward) = info[(state, action)]
-            new_v.append(reward + environment.gamma * v[state])
+            new_v.append(reward + environment.gamma * v[next_state])
 
         new_v = np.array(new_v)
         best_value = new_v.max()
