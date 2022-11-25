@@ -102,14 +102,14 @@ def compute_policy(environment):
 
             # else , find best action 
             old_v = v[state]
-            rewards = []
+            values = []
 
             # most_valuable_action = 'U'
             for action in environment.actions:
                 next_state, reward = info[(state, action)]
-                rewards.append(reward + environment.gamma * v[next_state])
+                values.append(reward + environment.gamma * v[next_state])
 
-            v[state] = np.array(rewards).max()
+            v[state] = np.array(values).max()
 
             # check conversion condition
             # If the difference between old value and new value of a state is lower than a
