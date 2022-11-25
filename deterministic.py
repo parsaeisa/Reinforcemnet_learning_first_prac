@@ -1,7 +1,4 @@
 # for defining environmets and rewards 
-import math
-from operator import truediv
-from os import stat
 import numpy as np
 
 GRID_HEIGHT = 5
@@ -98,8 +95,6 @@ def compute_policy(environment):
     while not converged:
         DELTA = 0
         for state in environment.states:
-            if state == 20:
-                print("hereee")
             # if state is terminal , value is 0 
             if environment.check_terminal(state):
                 v[state] = 0
@@ -129,8 +124,6 @@ def compute_policy(environment):
     policy = np.full(environment.grid_width * environment.grid_width, 'n')
 
     for state in environment.states:
-        if state == 20:
-            print("hereee")
         new_v = []
         for action in environment.actions:
             (next_state, reward) = info[(state, action)]
